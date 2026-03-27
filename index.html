@@ -1,13 +1,55 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles/global.css">
-    <title>Mini Scratch Online Code Editor</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mini Scratch – Online Code Editor</title>
+  <link rel="stylesheet" href="styles/global.css" />
+  <style>
+    .hero { text-align: center; padding: 80px 16px 40px; }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); margin: 0 0 12px; }
+    .hero p { color: var(--text-dim); font-size: 18px; margin: 0 0 32px; }
+    .features { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 16px; margin-top: 40px; }
+    .feature { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .feature h3 { margin: 0 0 8px; font-size: 16px; }
+    .feature p { margin: 0; font-size: 14px; color: var(--text-dim); }
+    .launch-btn { font-size: 18px; padding: 14px 28px; }
+  </style>
 </head>
 <body>
-    <h1>Welcome to the Mini Scratch Online Code Editor</h1>
-    <p><a href="/editor/">Go to Editor</a></p>
+  <div class="container">
+    <div class="hero">
+      <h1>Mini Scratch</h1>
+      <p>A browser-based code editor that speaks HTML, JS, VBScript,<br>custom languages, and Scratch blocks.</p>
+      <a class="btn launch-btn" href="/editor/">Open Editor →</a>
+    </div>
+
+    <div class="features">
+      <div class="feature">
+        <h3>📝 Text Editor</h3>
+        <p>Edit HTML, JavaScript, VBScript, or any custom file extension with syntax-aware tabs.</p>
+      </div>
+      <div class="feature">
+        <h3>🧩 Block Editor</h3>
+        <p>Work with Scratch <code>.sb3</code> projects via an embedded TurboWarp editor.</p>
+      </div>
+      <div class="feature">
+        <h3>📦 ZIP Packager</h3>
+        <p>Export your project as a downloadable ZIP ready to run locally.</p>
+      </div>
+      <div class="feature">
+        <h3>🔄 Translation</h3>
+        <p>Convert between JS↔HTML and Blocks↔JS where supported; unsupported paths show a clear error.</p>
+      </div>
+      <div class="feature">
+        <h3>👀 Live Preview</h3>
+        <p>HTML files render in a live preview pane on the right side of the editor.</p>
+      </div>
+      <div class="feature">
+        <h3>💾 Persistent Storage</h3>
+        <p>Projects are saved automatically in your browser's LocalStorage between sessions.</p>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

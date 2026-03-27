@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Editor – Mini Scratch</title>
+  <link rel="stylesheet" href="/styles/global.css" />
+  <link rel="stylesheet" href="./app.css" />
+</head>
+<body>
+  <!-- ── Top bar ─────────────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar__left">
+      <a class="home-link" href="/" title="Home">🏠</a>
+      <strong>Mini Scratch</strong>
+      <span class="pill" id="enginePill">TurboWarp embed</span>
+    </div>
+
+    <div class="topbar__right">
+      <button class="btn2" id="btnNewFile">＋ New file</button>
+      <button class="btn2" id="btnUpload">⬆ Upload</button>
+      <button class="btn2" id="btnDownloadZip">📦 Package ZIP</button>
+      <span class="sep"></span>
+      <label class="sr-only" for="translateFrom">From</label>
+      <select id="translateFrom" class="select2" title="Translate from">
+        <option value="blocks">Blocks (.sb3)</option>
+        <option value="js" selected>JavaScript (.js)</option>
+        <option value="html">HTML (.html)</option>
+        <option value="vbs">VBScript (.vbs)</option>
+        <option value="text">Text (custom)</option>
+      </select>
+      <span class="arrow" aria-hidden="true">→</span>
+      <label class="sr-only" for="translateTo">To</label>
+      <select id="translateTo" class="select2" title="Translate to">
+        <option value="blocks">Blocks (.sb3)</option>
+        <option value="js">JavaScript (.js)</option>
+        <option value="html" selected>HTML (.html)</option>
+        <option value="vbs">VBScript (.vbs)</option>
+        <option value="text">Text (custom)</option>
+      </select>
+      <button class="btn2" id="btnTranslate">Translate</button>
+    </div>
+  </header>
+
+  <!-- ── Main layout ──────────────────────────────────────────────────── -->
+  <main class="layout">
+    <!-- Left pane: tabs + editor -->
+    <section class="pane pane--editor" aria-label="Editor">
+      <div class="tabs" id="tabs" role="tablist" aria-label="Open files"></div>
+
+      <div class="editorArea">
+        <!-- Text editor (shown for non-.sb3 files) -->
+        <textarea id="textEditor" spellcheck="false" aria-label="Code editor"></textarea>
+
+        <!-- Blocks area (shown for .sb3 files) -->
+        <div class="blocksArea hidden" id="blocksArea">
+          <div class="blocksHeader">
+            <div>
+              <strong>Scratch Blocks Editor</strong>
+              <div class="small2">Powered by TurboWarp. Use the buttons to open or export <code>.sb3</code> projects.</div>
+            </div>
+            <div class="blocksHeader__actions">
+              <button class="btn2" id="btnOpenSb3">📂 Open .sb3</button>
+              <button class="btn2" id="btnExportSb3">💾 Export .sb3</button>
+            </div>
+          </div>
+
+          <iframe
+            id="turbowarpFrame"
+            title="TurboWarp block editor"
+            class="twFrame"
+            src="./turbowarp-embed.html"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-downloads allow-popups"
+          ></iframe>
+
+          <div class="notice">
+            <strong>ℹ Note:</strong> Full postMessage integration (open/export hooks) is a follow-up step.
+            The iframe currently shows the hosted TurboWarp editor.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right pane: preview / console / files -->
+    <section class="pane pane--right" aria-label="Side panel">
+      <div class="rightTabs" role="tablist" aria-label="Side panels">
+        <button class="rtab active" data-view="preview" role="tab" aria-selected="true">👁 Preview</button>
+        <button class="rtab" data-view="console" role="tab" aria-selected="false">🖥 Console</button>
+        <button class="rtab" data-view="files" role="tab" aria-selected="false">📁 Files</button>
+      </div>
+
+      <div class="rightBody">
+        <div class="view active" id="viewPreview" role="tabpanel">
+          <iframe id="htmlPreview" class="previewFrame" title="HTML live preview" sandbox="allow-scripts"></iframe>
+        </div>
+        <div class="view hidden" id="viewConsole" role="tabpanel">
+          <pre id="consoleOut" class="console"></pre>
+          <button class="btn2 btn--small" id="btnClearConsole">Clear</button>
+        </div>
+        <div class="view hidden" id="viewFiles" role="tabpanel">
+          <div class="filesList" id="filesList"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Hidden file input for upload -->
+  <input id="fileInput" type="file" multiple hidden aria-hidden="true" />
+  <input id="sb3Input" type="file" accept=".sb3" hidden aria-hidden="true" />
+
+  <!-- ── Modals ────────────────────────────────────────────────────────── -->
+
+  <!-- New file modal -->
+  <div class="modal-backdrop hidden" id="modalNewFile" role="dialog" aria-modal="true" aria-labelledby="modalNewFileTitle">
+    <div class="modal">
+      <h2 id="modalNewFileTitle">New File</h2>
+      <label>
+        File name (include extension, e.g. <code>main.js</code>)
+        <input type="text" id="newFileName" class="text-input" placeholder="untitled.js" />
+      </label>
+      <div class="modal-actions">
+        <button class="btn2" id="confirmNewFile">Create</button>
+        <button class="btn2 btn--ghost" id="cancelNewFile">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rename modal -->
+  <div class="modal-backdrop hidden" id="modalRename" role="dialog" aria-modal="true" aria-labelledby="modalRenameTitle">
+    <div class="modal">
+      <h2 id="modalRenameTitle">Rename File</h2>
+      <label>
+        New name
+        <input type="text" id="renameInput" class="text-input" />
+      </label>
+      <div class="modal-actions">
+        <button class="btn2" id="confirmRename">Rename</button>
+        <button class="btn2 btn--ghost" id="cancelRename">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Translation error / unsupported modal -->
+  <div class="modal-backdrop hidden" id="modalTranslateError" role="dialog" aria-modal="true" aria-labelledby="modalTranslateErrorTitle">
+    <div class="modal">
+      <h2 id="modalTranslateErrorTitle">⚠ Translation Not Supported</h2>
+      <p id="modalTranslateErrorMsg"></p>
+      <div class="modal-actions">
+        <button class="btn2 btn--danger" id="confirmDeleteCode">Delete code &amp; continue</button>
+        <button class="btn2 btn--ghost" id="cancelTranslate">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generic alert modal -->
+  <div class="modal-backdrop hidden" id="modalAlert" role="dialog" aria-modal="true" aria-labelledby="modalAlertTitle">
+    <div class="modal">
+      <h2 id="modalAlertTitle">Notice</h2>
+      <p id="modalAlertMsg"></p>
+      <div class="modal-actions">
+        <button class="btn2" id="confirmAlert">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
