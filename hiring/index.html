@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Join the Team – Mini Scratch</title>
+  <link rel="stylesheet" href="../styles/global.css" />
+  <style>
+    .hero { text-align: center; padding: 80px 16px 40px; }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3rem); margin: 0 0 12px; }
+    .hero p  { color: var(--text-dim); font-size: 18px; max-width: 640px; margin: 0 auto 32px; }
+    .apply-btn { font-size: 18px; padding: 14px 32px; background: var(--accent); border-color: var(--accent); color: #fff; }
+    .apply-btn:hover { background: #2563eb; border-color: #2563eb; }
+    .roles { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 16px; margin-top: 48px; }
+    .role  { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .role h3 { margin: 0 0 8px; font-size: 16px; }
+    .role p  { margin: 0; font-size: 14px; color: var(--text-dim); }
+    .back { display: inline-block; margin-top: 40px; font-size: 14px; color: var(--text-dim); text-decoration: none; }
+    .back:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <h1>🚀 Help Build Mini Scratch</h1>
+      <p>
+        Mini Scratch is a browser-based code editor that supports HTML, JavaScript,
+        VBScript, custom languages, and Scratch blocks — all with no build step or backend.
+        We're looking for passionate contributors to help push it further.
+      </p>
+      <a class="btn apply-btn"
+         href="https://docs.google.com/forms/d/e/1FAIpQLSfHnwYp5JcAheg1TeqYP1-ugAWfBOTm4EMtuPk9VUrhOkGEOQ/viewform?usp=publish-editor"
+         target="_blank" rel="noopener">
+        Apply to Join →
+      </a>
+    </div>
+
+    <div class="roles">
+      <div class="role">
+        <h3>🧩 Block Editor</h3>
+        <p>Wire up the TurboWarp postMessage API so Scratch <code>.sb3</code> files can be opened and exported seamlessly inside the editor.</p>
+      </div>
+      <div class="role">
+        <h3>🔄 Translator</h3>
+        <p>Implement the Scratch VM code-generation pipeline to enable real Blocks ↔ JS conversion.</p>
+      </div>
+      <div class="role">
+        <h3>🎨 UI / UX</h3>
+        <p>Improve the editor's look, feel, and accessibility — dark-theme polish, keyboard shortcuts, responsive layouts.</p>
+      </div>
+      <div class="role">
+        <h3>📦 Packager</h3>
+        <p>Integrate <code>@turbowarp/packager</code> to produce fully self-contained HTML exports from <code>.sb3</code> projects.</p>
+      </div>
+      <div class="role">
+        <h3>🧪 Testing</h3>
+        <p>Write unit and integration tests so we can refactor confidently as the project grows.</p>
+      </div>
+      <div class="role">
+        <h3>📝 Documentation</h3>
+        <p>Write guides, API docs, and tutorials to help new users and contributors get up to speed quickly.</p>
+      </div>
+    </div>
+
+    <p style="text-align:center; margin-top:48px; color:var(--text-dim); font-size:14px;">
+      All skill levels welcome — whether you're a beginner or an experienced developer.
+    </p>
+
+    <div style="text-align:center;">
+      <a class="back" href="..">← Back to Mini Scratch</a>
+    </div>
+  </div>
+</body>
+</html>
