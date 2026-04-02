@@ -12,6 +12,9 @@
  * "Delete / Cancel" modal rather than silently failing.
  */
 
+(function () {
+'use strict';
+
 /**
  * Result object returned by `translate()`.
  * @typedef {{ ok: boolean, output?: string, error?: string }} TranslateResult
@@ -25,7 +28,7 @@
  * @param {string} source – the source code / content to translate
  * @returns {TranslateResult}
  */
-export function translate(from, to, source) {
+function translate(from, to, source) {
   if (from === to) {
     return { ok: true, output: source };
   }
@@ -150,3 +153,7 @@ function languageLabel(key) {
   };
   return map[key] || key;
 }
+
+window.translate = translate;
+
+})();

@@ -15,12 +15,12 @@
  *       A README_SB3.txt placeholder is added explaining that full
  *       TurboWarp packaging requires a follow-up step.
  *
- * Usage (ES module):
- *   import { packageProject } from './packager.js';
+ * Usage:
  *   await packageProject(files);   // files: Map<name, {content, type}>
  */
 
-import { ZipWriter } from './jszip-mini.js';
+(function () {
+'use strict';
 
 const SB3_NOTE = `SB3 Packaging – Placeholder
 ===========================
@@ -53,7 +53,7 @@ one of the following (future integration steps):
  *   Map of filename → file descriptor.
  * @param {string} [zipName='project.zip']
  */
-export async function packageProject(files, zipName = 'project.zip') {
+async function packageProject(files, zipName = 'project.zip') {
   const zip = new ZipWriter();
   let hasSb3 = false;
   let hasIndex = false;
@@ -128,3 +128,7 @@ function generateLauncher(names) {
 function escHtml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
+
+window.packageProject = packageProject;
+
+})();

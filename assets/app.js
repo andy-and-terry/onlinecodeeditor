@@ -15,9 +15,6 @@
  *  • LocalStorage persistence
  */
 
-import { packageProject } from './packager.js';
-import { translate }       from './translate.js';
-
 // ── Storage key ───────────────────────────────────────────────────────────
 const STORAGE_KEY = 'miniScratch.project.v1';
 /** Delay in ms before revoking an object URL after triggering a download. */
@@ -29,16 +26,6 @@ let files       = new Map();
 let activeFile  = null;
 /** Pending rename target (while modal is open). */
 let renameTarget = null;
-
-// ── Boot ──────────────────────────────────────────────────────────────────
-loadFromStorage();
-if (files.size === 0) {
-  addFile('index.html', DEFAULT_HTML);
-  addFile('app.js',     DEFAULT_JS);
-}
-renderTabs();
-renderFilesList();
-if (!activeFile) setActive(files.keys().next().value);
 
 // ── DOM refs ──────────────────────────────────────────────────────────────
 const $textEditor     = /** @type {HTMLTextAreaElement} */ (q('#textEditor'));
@@ -588,3 +575,13 @@ const DEFAULT_HTML = `<!doctype html>
 const DEFAULT_JS = `// app.js – Edit me!
 console.log('Hello from Mini Scratch!');
 `;
+
+// ── Boot ──────────────────────────────────────────────────────────────────
+loadFromStorage();
+if (files.size === 0) {
+  addFile('index.html', DEFAULT_HTML);
+  addFile('app.js',     DEFAULT_JS);
+}
+renderTabs();
+renderFilesList();
+if (!activeFile) setActive(files.keys().next().value);
