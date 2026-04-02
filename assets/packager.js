@@ -20,7 +20,7 @@
  *   await packageProject(files);   // files: Map<name, {content, type}>
  */
 
-import { ZipWriter } from '../vendor/jszip-mini.js';
+import { ZipWriter } from './jszip-mini.js';
 
 const SB3_NOTE = `SB3 Packaging – Placeholder
 ===========================
