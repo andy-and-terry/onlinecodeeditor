@@ -65,7 +65,7 @@ function concat(arrays) {
   return out;
 }
 
-export class ZipWriter {
+class ZipWriter {
   constructor() {
     /** @type {Array<{name: Uint8Array, data: Uint8Array, crc: number, offset: number}>} */
     this._entries = [];

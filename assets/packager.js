@@ -20,7 +20,6 @@
  *   await packageProject(files);   // files: Map<name, {content, type}>
  */
 
-import { ZipWriter } from './jszip-mini.js';
 
 const SB3_NOTE = `SB3 Packaging – Placeholder
 ===========================
@@ -53,7 +52,7 @@ one of the following (future integration steps):
  *   Map of filename → file descriptor.
  * @param {string} [zipName='project.zip']
  */
-export async function packageProject(files, zipName = 'project.zip') {
+async function packageProject(files, zipName = 'project.zip') {
   const zip = new ZipWriter();
   let hasSb3 = false;
   let hasIndex = false;
