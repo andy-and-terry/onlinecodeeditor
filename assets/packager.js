@@ -104,7 +104,7 @@ export async function packageProject(files, zipName = 'project.zip') {
  * @returns {string}
  */
 function generateLauncher(names) {
-  const items = names.map(n => `<li><a href="${escHtml(n)}">${escHtml(n)}</a></li>`).join('\n    ');
+  const items = names.map(n => { const e = escHtml(n); return `<li><a href="${e}">${e}</a></li>`; }).join('\n    ');
   return `<!doctype html>
 <html lang="en">
 <head>
