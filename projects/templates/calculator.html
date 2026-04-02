@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Simple Calculator</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background: #1a1a2e;
+    }
+    .calc {
+      background: #16213e;
+      border-radius: 16px;
+      padding: 24px;
+      width: 280px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.5);
+    }
+    #display {
+      background: #0f3460;
+      color: #e0e0e0;
+      font-size: 2rem;
+      text-align: right;
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      min-height: 56px;
+      word-break: break-all;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    button {
+      background: #e94560;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      padding: 16px 0;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    button:hover  { background: #c73652; }
+    button.op     { background: #0f3460; }
+    button.op:hover { background: #0a2540; }
+    button.wide   { grid-column: span 2; }
+    button.eq     { background: #e94560; }
+  </style>
+</head>
+<body>
+  <div class="calc">
+    <div id="display">0</div>
+    <div class="buttons">
+      <button class="op" onclick="clearAll()">C</button>
+      <button class="op" onclick="toggleSign()">+/−</button>
+      <button class="op" onclick="percent()">%</button>
+      <button class="op" onclick="input('/')">÷</button>
+
+      <button onclick="input('7')">7</button>
+      <button onclick="input('8')">8</button>
+      <button onclick="input('9')">9</button>
+      <button class="op" onclick="input('*')">×</button>
+
+      <button onclick="input('4')">4</button>
+      <button onclick="input('5')">5</button>
+      <button onclick="input('6')">6</button>
+      <button class="op" onclick="input('-')">−</button>
+
+      <button onclick="input('1')">1</button>
+      <button onclick="input('2')">2</button>
+      <button onclick="input('3')">3</button>
+      <button class="op" onclick="input('+')">+</button>
+
+      <button class="wide" onclick="input('0')">0</button>
+      <button onclick="input('.')">.</button>
+      <button class="eq" onclick="calculate()">=</button>
+    </div>
+  </div>
+  <script>
+    let expr = '';
+    const display = document.getElementById('display');
+
+    function input(val) {
+      if (expr === '0' && val !== '.') expr = '';
+      expr += val;
+      display.textContent = expr;
+    }
+
+    function clearAll() {
+      expr = '';
+      display.textContent = '0';
+    }
+
+    function calculate() {
+      try {
+        // NOTE: The Function constructor is used here only to evaluate the
+        // button-assembled expression string (digits and +-*/ operators).
+        // User-typed free input is NOT accepted, so the attack surface is
+        // limited; replace with a proper expression parser for production use.
+        // eslint-disable-next-line no-new-func
+        const result = Function('"use strict"; return (' + expr + ')')();
+        expr = String(parseFloat(result.toFixed(10)));
+        display.textContent = expr;
+      } catch {
+        display.textContent = 'Error';
+        expr = '';
+      }
+    }
+
+    function toggleSign() {
+      if (!expr) return;
+      expr = String(-parseFloat(expr));
+      display.textContent = expr;
+    }
+
+    function percent() {
+      if (!expr) return;
+      expr = String(parseFloat(expr) / 100);
+      display.textContent = expr;
+    }
+  </script>
+</body>
+</html>
