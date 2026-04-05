@@ -15,11 +15,12 @@
  *       A README_SB3.txt placeholder is added explaining that full
  *       TurboWarp packaging requires a follow-up step.
  *
- * Usage (ES module):
- *   import { packageProject } from './packager.js';
+ * Usage:
  *   await packageProject(files);   // files: Map<name, {content, type}>
  */
 
+(function () {
+'use strict';
 
 const SB3_NOTE = `SB3 Packaging – Placeholder
 ===========================
@@ -127,3 +128,7 @@ function generateLauncher(names) {
 function escHtml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
+
+window.packageProject = packageProject;
+
+})();

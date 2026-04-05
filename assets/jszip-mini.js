@@ -7,13 +7,15 @@
  *   - Binary content via Uint8Array.
  *
  * Usage:
- *   import { ZipWriter } from './jszip-mini.js';
  *   const zip = new ZipWriter();
  *   zip.addFile('hello.txt', 'Hello, world!');
  *   zip.addFile('data.bin', new Uint8Array([0,1,2]));
  *   const blob = zip.toBlob();          // application/zip
  *   const url  = URL.createObjectURL(blob);
  */
+
+(function () {
+'use strict';
 
 const SIGNATURE_LOCAL  = 0x04034b50;
 const SIGNATURE_CDIR   = 0x02014b50;
@@ -170,3 +172,7 @@ class ZipWriter {
     setTimeout(() => URL.revokeObjectURL(url), URL_REVOKE_DELAY_MS);
   }
 }
+
+window.ZipWriter = ZipWriter;
+
+})();
