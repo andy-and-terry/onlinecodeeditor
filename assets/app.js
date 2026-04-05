@@ -20,6 +20,12 @@
 const STORAGE_KEY = 'miniScratch.project.v1';
 /** Delay in ms before revoking an object URL after triggering a download. */
 const URL_REVOKE_DELAY_MS = 10_000;
+/** Debounce delay (ms) for persisting edits to localStorage. */
+const SAVE_DEBOUNCE_MS = 1_000;
+/** Debounce delay (ms) for refreshing the HTML preview while typing. */
+const PREVIEW_DEBOUNCE_MS = 500;
+/** Maximum file size (bytes) accepted via the upload button. */
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024; // 10 MB
 
 // ── State ─────────────────────────────────────────────────────────────────
 /** @type {Map<string, { content: string, isBinary?: boolean }>} */
@@ -27,6 +33,10 @@ let files       = new Map();
 let activeFile  = null;
 /** Pending rename target (while modal is open). */
 let renameTarget = null;
+/** @type {ReturnType<typeof setTimeout>|null} */
+let _saveTimer    = null;
+/** @type {ReturnType<typeof setTimeout>|null} */
+let _previewTimer = null;
 
 // ── Boot ──────────────────────────────────────────────────────────────────
 loadFromStorage();
@@ -146,8 +156,12 @@ $textEditor.addEventListener('input', () => {
   const fd = files.get(activeFile);
   if (fd) {
     fd.content = $textEditor.value;
-    saveToStorage();
-    refreshPreview();
+    // Debounce persistence – avoid a full JSON serialise on every keystroke.
+    clearTimeout(_saveTimer);
+    _saveTimer = setTimeout(saveToStorage, SAVE_DEBOUNCE_MS);
+    // Debounce preview – avoid forcing a full iframe reload on every keystroke.
+    clearTimeout(_previewTimer);
+    _previewTimer = setTimeout(refreshPreview, PREVIEW_DEBOUNCE_MS);
   }
 });
 
@@ -174,9 +188,14 @@ function addFile(name, content, isBinary = false) {
 /** @param {string} name */
 function setActive(name) {
   if (!files.has(name)) return;
-  // Save current editor content first
+  // Flush any pending debounced save and persist current editor content.
   if (activeFile && files.has(activeFile)) {
-    files.get(activeFile).content = $textEditor.value;
+    const prev = files.get(activeFile);
+    if (!prev.isBinary && prev.content !== $textEditor.value) {
+      prev.content = $textEditor.value;
+      clearTimeout(_saveTimer);
+      saveToStorage();
+    }
   }
   activeFile = name;
 
@@ -337,6 +356,10 @@ async function handleUpload(e) {
   if (!fileList || fileList.length === 0) return;
 
   for (const file of fileList) {
+    if (file.size > MAX_UPLOAD_BYTES) {
+      consoleLog(`⚠ Skipped "${file.name}": file exceeds the 10 MB limit.`);
+      continue;
+    }
     const isBinary = isBinaryExtension(file.name);
     if (isBinary) {
       const buf   = await file.arrayBuffer();
