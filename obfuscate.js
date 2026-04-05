@@ -35,6 +35,7 @@ const options = {
   stringArrayWrappersType: 'variable',
   stringArrayThreshold: 0.75,
   unicodeEscapeSequence: false,
+  sourceType: 'module',
   sourceType: 'script',
 };
 
