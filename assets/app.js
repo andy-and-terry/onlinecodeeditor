@@ -15,8 +15,6 @@
  *  • LocalStorage persistence
  */
 
-import { packageProject } from './packager.js';
-import { translate }       from './translate.js';
 
 // ── Storage key ───────────────────────────────────────────────────────────
 const STORAGE_KEY = 'miniScratch.project.v1';
