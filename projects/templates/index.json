@@ -1,0 +1,44 @@
+[
+  {
+    "id": "hello-world-html",
+    "name": "Hello World (HTML)",
+    "description": "A minimal HTML page with a heading and linked script.",
+    "file": "hello-world.html",
+    "type": "html"
+  },
+  {
+    "id": "calculator-html",
+    "name": "Simple Calculator (HTML)",
+    "description": "A functional four-operation calculator with a styled UI.",
+    "file": "calculator.html",
+    "type": "html"
+  },
+  {
+    "id": "hello-world-js",
+    "name": "Hello World (JavaScript)",
+    "description": "Greet the world and explore variables, functions, and arrays.",
+    "file": "hello-world.js",
+    "type": "js"
+  },
+  {
+    "id": "guess-the-number-js",
+    "name": "Guess the Number (JavaScript)",
+    "description": "A random number guessing game that works as a standalone page.",
+    "file": "guess-the-number.js",
+    "type": "js"
+  },
+  {
+    "id": "hello-world-vbs",
+    "name": "Hello World (VBScript)",
+    "description": "Variables, subroutines, loops, and arrays in VBScript.",
+    "file": "hello-world.vbs",
+    "type": "vbs"
+  },
+  {
+    "id": "scratch-starter-sb3",
+    "name": "Scratch Starter (Blocks)",
+    "description": "A bare-bones Scratch 3 project: click the flag to make the sprite say Hello, World!",
+    "file": "scratch-starter.sb3",
+    "type": "sb3"
+  }
+]

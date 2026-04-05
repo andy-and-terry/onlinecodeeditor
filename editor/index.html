@@ -18,6 +18,7 @@
 
     <div class="topbar__right">
       <button class="btn2" id="btnNewFile">＋ New file</button>
+      <button class="btn2" id="btnTemplates">📋 Templates</button>
       <button class="btn2" id="btnUpload">⬆ Upload</button>
       <button class="btn2" id="btnDownloadZip">📦 Package ZIP</button>
       <span class="sep"></span>
@@ -152,6 +153,22 @@
     </div>
   </div>
 
+  <!-- Templates modal -->
+  <div class="modal-backdrop hidden" id="modalTemplates" role="dialog" aria-modal="true" aria-labelledby="modalTemplatesTitle">
+    <div class="modal modal--wide">
+      <h2 id="modalTemplatesTitle">📋 Load a Template</h2>
+      <p style="color:var(--text-dim);font-size:14px;margin:0 0 16px">
+        Choose a sample project to open in the editor. It will be added as a new file.
+      </p>
+      <div id="templatesList" class="templates-list">
+        <em style="color:var(--text-dim)">Loading…</em>
+      </div>
+      <div class="modal-actions">
+        <button class="btn2 btn--ghost" id="cancelTemplates">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Generic alert modal -->
   <div class="modal-backdrop hidden" id="modalAlert" role="dialog" aria-modal="true" aria-labelledby="modalAlertTitle">
     <div class="modal">
@@ -163,9 +180,9 @@
     </div>
   </div>
 
-  <script src="../assets/jszip-mini.js"></script>
-  <script src="../assets/packager.js"></script>
-  <script src="../assets/translate.js"></script>
-  <script src="../assets/app.js"></script>
+  <script defer src="../assets/jszip-mini.js"></script>
+  <script defer src="../assets/packager.js"></script>
+  <script defer src="../assets/translate.js"></script>
+  <script defer src="../assets/app.js"></script>
 </body>
 </html>
