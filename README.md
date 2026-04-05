@@ -1,5 +1,8 @@
 # Mini Scratch – Online Code Editor
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Contributing](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
 A browser-based code editor that speaks HTML, JavaScript, VBScript, custom file extensions, and Scratch blocks (`.sb3`) via an embedded TurboWarp editor.  No build step or backend required — open `index.html` in any modern browser.
 
 ---
@@ -27,19 +30,21 @@ python3 -m http.server 8080 # Python 3
 ```
 .
 ├── index.html                  Landing page → links to /editor/
-├── styles/
-│   └── global.css              Shared dark-theme styles
-├── editor/
-│   ├── index.html              Editor shell (tabs, toolbar, panes)
+├── assets/
+│   ├── global.css              Shared dark-theme styles
 │   ├── app.css                 Editor-specific styles
 │   ├── app.js                  Editor logic (ES module)
-│   ├── turbowarp-embed.html    TurboWarp iframe bridge + postMessage scaffold
-│   ├── packager/
-│   │   └── packager.js         ZIP packager (exports current project)
-│   ├── translate/
-│   │   └── translate.js        Language-to-language conversion pipeline
-│   └── vendor/
-│       └── jszip-mini.js       Minimal dependency-free ZIP writer
+│   ├── translate.js            Language-to-language conversion pipeline
+│   ├── packager.js             ZIP packager (exports current project)
+│   └── jszip-mini.js           Minimal dependency-free ZIP writer
+├── editor/
+│   ├── index.html              Editor shell (tabs, toolbar, panes)
+│   └── turbowarp-embed.html    TurboWarp iframe bridge + postMessage scaffold
+├── hiring/
+│   └── index.html              "Join the Team" page
+├── CONTRIBUTING.md
+├── CODE_OF_CONDUCT.md
+├── LICENSE
 └── README.md
 ```
 
@@ -82,7 +87,13 @@ Steps to complete:
 Translating between Scratch blocks and JavaScript requires the Scratch VM's code-generation API.  The translate module returns a clear error with a "Delete / Cancel" modal until this is wired up.
 
 ### .sb3 ZIP Packaging
-`.sb3` files are included as raw binary in the exported ZIP.  To produce a truly self-contained runnable HTML from a `.sb3`, use [packager.turbowarp.org](https://packager.turbowarp.org/) or integrate `@turbowarp/packager` into a build step.  See `editor/packager/packager.js` for the placeholder note.
+`.sb3` files are included as raw binary in the exported ZIP.  To produce a truly self-contained runnable HTML from a `.sb3`, use [packager.turbowarp.org](https://packager.turbowarp.org/) or integrate `@turbowarp/packager` into a build step.  See `assets/packager.js` for the placeholder note.
+
+---
+
+## Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) to get started and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for community guidelines. The project is licensed under the [MIT License](LICENSE).
 
 ---
 

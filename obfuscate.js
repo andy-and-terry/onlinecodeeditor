@@ -36,6 +36,7 @@ const options = {
   stringArrayThreshold: 0.75,
   unicodeEscapeSequence: false,
   sourceType: 'module',
+  sourceType: 'script',
 };
 
 for (const file of files) {
