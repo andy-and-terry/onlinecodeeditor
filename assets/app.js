@@ -15,13 +15,17 @@
  *  • LocalStorage persistence
  */
 
-import { packageProject } from './packager.js';
-import { translate }       from './translate.js';
 
 // ── Storage key ───────────────────────────────────────────────────────────
 const STORAGE_KEY = 'miniScratch.project.v1';
 /** Delay in ms before revoking an object URL after triggering a download. */
 const URL_REVOKE_DELAY_MS = 10_000;
+/** Debounce delay (ms) for persisting edits to localStorage. */
+const SAVE_DEBOUNCE_MS = 1_000;
+/** Debounce delay (ms) for refreshing the HTML preview while typing. */
+const PREVIEW_DEBOUNCE_MS = 500;
+/** Maximum file size (bytes) accepted via the upload button. */
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024; // 10 MB
 
 // ── State ─────────────────────────────────────────────────────────────────
 /** @type {Map<string, { content: string, isBinary?: boolean }>} */
@@ -29,6 +33,10 @@ let files       = new Map();
 let activeFile  = null;
 /** Pending rename target (while modal is open). */
 let renameTarget = null;
+/** @type {ReturnType<typeof setTimeout>|null} */
+let _saveTimer    = null;
+/** @type {ReturnType<typeof setTimeout>|null} */
+let _previewTimer = null;
 
 // ── Boot ──────────────────────────────────────────────────────────────────
 loadFromStorage();
@@ -53,6 +61,9 @@ const $turbowarpFrame = /** @type {HTMLIFrameElement}   */ (q('#turbowarpFrame')
 
 // ── Topbar buttons ────────────────────────────────────────────────────────
 q('#btnNewFile').addEventListener('click', () => openModal('modalNewFile'));
+
+q('#btnTemplates').addEventListener('click', openTemplatesModal);
+q('#cancelTemplates').addEventListener('click', () => closeModal('modalTemplates'));
 
 q('#btnUpload').addEventListener('click', () => $fileInput.click());
 $fileInput.addEventListener('change', handleUpload);
@@ -145,8 +156,12 @@ $textEditor.addEventListener('input', () => {
   const fd = files.get(activeFile);
   if (fd) {
     fd.content = $textEditor.value;
-    saveToStorage();
-    refreshPreview();
+    // Debounce persistence – avoid a full JSON serialise on every keystroke.
+    clearTimeout(_saveTimer);
+    _saveTimer = setTimeout(saveToStorage, SAVE_DEBOUNCE_MS);
+    // Debounce preview – avoid forcing a full iframe reload on every keystroke.
+    clearTimeout(_previewTimer);
+    _previewTimer = setTimeout(refreshPreview, PREVIEW_DEBOUNCE_MS);
   }
 });
 
@@ -173,9 +188,14 @@ function addFile(name, content, isBinary = false) {
 /** @param {string} name */
 function setActive(name) {
   if (!files.has(name)) return;
-  // Save current editor content first
+  // Flush any pending debounced save and persist current editor content.
   if (activeFile && files.has(activeFile)) {
-    files.get(activeFile).content = $textEditor.value;
+    const prev = files.get(activeFile);
+    if (!prev.isBinary && prev.content !== $textEditor.value) {
+      prev.content = $textEditor.value;
+      clearTimeout(_saveTimer);
+      saveToStorage();
+    }
   }
   activeFile = name;
 
@@ -336,6 +356,10 @@ async function handleUpload(e) {
   if (!fileList || fileList.length === 0) return;
 
   for (const file of fileList) {
+    if (file.size > MAX_UPLOAD_BYTES) {
+      consoleLog(`⚠ Skipped "${file.name}": file exceeds the 10 MB limit.`);
+      continue;
+    }
     const isBinary = isBinaryExtension(file.name);
     if (isBinary) {
       const buf   = await file.arrayBuffer();
@@ -565,6 +589,88 @@ function triggerDownload(blob, name) {
 function isBinaryExtension(filename) {
   const ext = filename.split('.').pop()?.toLowerCase() ?? '';
   return ['sb3', 'png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico', 'wav', 'mp3', 'ogg', 'mp4', 'zip'].includes(ext);
+}
+
+// ── Templates ──────────────────────────────────────────────────────────────
+
+const TEMPLATES_BASE = '/projects/templates/';
+/** @type {Array<{id:string,name:string,description:string,file:string,type:string}>|null} */
+let templatesCache = null;
+
+async function openTemplatesModal() {
+  openModal('modalTemplates');
+  const list = q('#templatesList');
+
+  if (!templatesCache) {
+    list.innerHTML = '<em style="color:var(--text-dim)">Loading…</em>';
+    try {
+      const res = await fetch(TEMPLATES_BASE + 'index.json');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      templatesCache = await res.json();
+    } catch (err) {
+      list.innerHTML = `<em style="color:var(--text-dim)">Could not load templates: ${err.message}</em>`;
+      return;
+    }
+  }
+
+  list.innerHTML = '';
+  for (const tpl of templatesCache) {
+    const entry = document.createElement('div');
+    entry.className = 'template-entry';
+
+    const info = document.createElement('div');
+    info.className = 'template-entry__info';
+
+    const name = document.createElement('strong');
+    name.textContent = tpl.name;
+
+    const desc = document.createElement('span');
+    desc.className = 'template-entry__desc';
+    desc.textContent = tpl.description;
+
+    info.appendChild(name);
+    info.appendChild(desc);
+
+    const loadBtn = document.createElement('button');
+    loadBtn.className = 'btn2';
+    loadBtn.textContent = 'Load';
+    loadBtn.addEventListener('click', () => loadTemplate(tpl));
+
+    entry.appendChild(info);
+    entry.appendChild(loadBtn);
+    list.appendChild(entry);
+  }
+}
+
+/** @param {{name:string,file:string,type:string}} tpl */
+async function loadTemplate(tpl) {
+  closeModal('modalTemplates');
+  const url = TEMPLATES_BASE + tpl.file;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const fileName = tpl.file;
+    const isBin = isBinaryExtension(fileName);
+
+    if (isBin) {
+      const buf   = await res.arrayBuffer();
+      const bytes = new Uint8Array(buf);
+      addFile(fileName, bytes, true);
+    } else {
+      const text = await res.text();
+      addFile(fileName, text);
+    }
+
+    consoleLog(`📋 Loaded template: ${fileName}`);
+    renderTabs();
+    renderFilesList();
+    saveToStorage();
+    setActive(fileName);
+  } catch (err) {
+    consoleLog(`✗ Could not load template "${tpl.file}": ${err.message}`);
+    showAlert('Template Error', err.message);
+  }
 }
 
 // ── Default file contents ─────────────────────────────────────────────────
