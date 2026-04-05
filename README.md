@@ -87,7 +87,7 @@ Steps to complete:
 Translating between Scratch blocks and JavaScript requires the Scratch VM's code-generation API.  The translate module returns a clear error with a "Delete / Cancel" modal until this is wired up.
 
 ### .sb3 ZIP Packaging
-`.sb3` files are included as raw binary in the exported ZIP.  To produce a truly self-contained runnable HTML from a `.sb3`, use [packager.turbowarp.org](https://packager.turbowarp.org/) or integrate `@turbowarp/packager` into a build step.  See `editor/packager/packager.js` for the placeholder note.
+`.sb3` files are included as raw binary in the exported ZIP.  To produce a truly self-contained runnable HTML from a `.sb3`, use [packager.turbowarp.org](https://packager.turbowarp.org/) or integrate `@turbowarp/packager` into a build step.  See `assets/packager.js` for the placeholder note.
 
 ---
 
