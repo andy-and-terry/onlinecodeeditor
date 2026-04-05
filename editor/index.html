@@ -13,7 +13,7 @@
     <div class="topbar__left">
       <a class="home-link" href="../" title="Home">🏠</a>
       <strong>Mini Scratch</strong>
-      <span class="pill" id="enginePill">Block Editor</span>
+      <span class="pill" id="enginePill">Scratch blocks</span>
     </div>
 
     <div class="topbar__right">
@@ -66,17 +66,13 @@
             </div>
           </div>
 
-          <div class="sb3Panel">
-            <div class="sb3Panel__icon">🧩</div>
-            <h3 class="sb3Panel__title">Scratch Project File</h3>
-            <p class="sb3Panel__desc">
-              Use <strong>Open .sb3</strong> to load an existing Scratch project, or
-              <strong>Export .sb3</strong> to download the current project file.
-            </p>
-            <p class="sb3Panel__hint">
-              The <code>.sb3</code> file is stored in your project and can be packaged with the ZIP export.
-            </p>
-          </div>
+          <iframe
+            id="turbowarpFrame"
+            title="Scratch block editor"
+            class="twFrame"
+            src="./scratch/"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-downloads allow-popups"
+          ></iframe>
         </div>
       </div>
     </section>

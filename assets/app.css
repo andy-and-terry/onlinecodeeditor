@@ -186,45 +186,10 @@
 
 .small2 { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
 
-/* ── Scratch (.sb3) panel ────────────────────────────────────────────── */
-.sb3Panel {
+.twFrame {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  padding: 48px 24px;
-  text-align: center;
-  background: var(--bg0);
-}
-
-.sb3Panel__icon {
-  font-size: 52px;
-  line-height: 1;
-}
-
-.sb3Panel__title {
-  margin: 0;
-  font-size: 18px;
-  color: var(--text);
-}
-
-.sb3Panel__desc {
-  margin: 0;
-  font-size: 13px;
-  color: var(--text-dim);
-  max-width: 380px;
-  line-height: 1.6;
-}
-
-.sb3Panel__hint {
-  margin: 0;
-  font-size: 12px;
-  color: var(--text-dim);
-  opacity: .7;
-  max-width: 380px;
-  line-height: 1.5;
+  width: 100%;
+  border: 0;
 }
 
 .hidden { display: none !important; }
