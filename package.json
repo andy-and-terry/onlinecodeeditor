@@ -1,7 +1,7 @@
 {
   "name": "onlinecodeeditor",
   "version": "1.0.0",
-  "description": "A browser-based code editor that speaks HTML, JavaScript, VBScript, custom file extensions, and Scratch blocks (`.sb3`) via an embedded TurboWarp editor.  No build step or backend required — open `index.html` in any modern browser.",
+  "description": "A browser-based code editor that speaks HTML, JavaScript, custom file extensions, and Scratch blocks (`.sb3`) via an embedded TurboWarp editor.  No build step or backend required — open `index.html` in any modern browser.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

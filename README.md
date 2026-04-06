@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Contributing](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-A browser-based code editor that speaks HTML, JavaScript, VBScript, custom file extensions, and Scratch blocks (`.sb3`) via an embedded TurboWarp editor.  No build step or backend required — open `index.html` in any modern browser.
+A browser-based code editor that speaks HTML, JavaScript, custom file extensions, and Scratch blocks (`.sb3`) via an embedded TurboWarp editor.  No build step or backend required — open `index.html` in any modern browser.
 
 ---
 
@@ -54,7 +54,7 @@ python3 -m http.server 8080 # Python 3
 
 | Feature | Status |
 |---|---|
-| Text editor (`.html`, `.js`, `.vbs`, `.css`, `.txt`, custom) | ✅ Implemented |
+| Text editor (`.html`, `.js`, `.css`, `.txt`, custom) | ✅ Implemented |
 | Tab-based multi-file editing | ✅ Implemented |
 | File create / rename / delete | ✅ Implemented |
 | Upload files (multi-select) | ✅ Implemented |
