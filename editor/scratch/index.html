@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Scratch Block Editor</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #0b0f17;
+      overflow: hidden;
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #e6edf3;
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    #workspaceWrap {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #blocklyDiv {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* Splash shown until a project is loaded */
+    #splash {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      background: #0b0f17;
+      padding: 32px;
+      text-align: center;
+    }
+    #splash.hidden { display: none; }
+
+    .splash-icon { font-size: 52px; line-height: 1; }
+    .splash-title { margin: 0; font-size: 18px; font-weight: 600; }
+    .splash-desc  { margin: 0; font-size: 13px; color: rgba(230,237,243,.6); max-width: 340px; line-height: 1.6; }
+
+    /* Bottom status bar */
+    #statusBar {
+      flex-shrink: 0;
+      padding: 5px 14px;
+      font-size: 12px;
+      color: rgba(230,237,243,.6);
+      border-top: 1px solid #22304a;
+      background: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Error strip (hidden by default) */
+    #errorBar {
+      display: none;
+      flex-shrink: 0;
+      padding: 7px 14px;
+      font-size: 12px;
+      color: #fca5a5;
+      background: #450a0a;
+      border-top: 1px solid #7f1d1d;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="workspaceWrap">
+      <div id="blocklyDiv"></div>
+      <div id="splash">
+        <div class="splash-icon">🧩</div>
+        <h2 class="splash-title">Scratch Block Editor</h2>
+        <p class="splash-desc">
+          Click <strong>Open .sb3</strong> in the toolbar to load a
+          Scratch project and start editing blocks.
+        </p>
+      </div>
+    </div>
+    <div id="errorBar"></div>
+    <div id="statusBar">No project loaded</div>
+  </div>
+
+  <!--
+    Self-hosted Scratch libraries loaded from the official npm CDN.
+    scratch-vm  handles .sb3 file I/O and the block runtime.
+    scratch-blocks provides the visual Blockly-based workspace.
+  -->
+  <script src="https://unpkg.com/scratch-vm@5/dist/web/scratch-vm.js"></script>
+  <script src="https://unpkg.com/scratch-blocks@2/scratch_vertical.js"></script>
+
+  <script>
+    /* ── Self-hosted Scratch block editor ───────────────────────────── */
+
+    // Library versions — must match the <script> src attributes above.
+    var SCRATCH_VM_VERSION     = '5';
+    var SCRATCH_BLOCKS_VERSION = '2';
+    var MEDIA_URL = 'https://unpkg.com/scratch-blocks@' + SCRATCH_BLOCKS_VERSION + '/media/';
+
+    var vm        = null;
+    var workspace = null;
+
+    // ── UI helpers ───────────────────────────────────────────────────
+    function setStatus(msg) {
+      document.getElementById('statusBar').textContent = msg;
+    }
+
+    function showError(msg) {
+      var bar = document.getElementById('errorBar');
+      bar.textContent = msg;
+      bar.style.display = 'block';
+    }
+
+    function clearError() {
+      document.getElementById('errorBar').style.display = 'none';
+    }
+
+    function hideSplash() {
+      document.getElementById('splash').classList.add('hidden');
+    }
+
+    // ── Initialise the Blockly workspace (lazy, only once) ───────────
+    function initWorkspace() {
+      if (workspace) return;
+
+      workspace = Blockly.inject('blocklyDiv', {
+        media: MEDIA_URL,
+        toolbox: '<xml></xml>',
+        zoom: {
+          controls:   true,
+          wheel:      true,
+          startScale: 0.75,
+          maxScale:   4,
+          minScale:   0.25,
+          scaleSpeed: 1.1
+        },
+        grid: {
+          spacing: 40,
+          length:  2,
+          colour:  '#22304a',
+          snap:    false
+        },
+        colours: {
+          workspace:              '#0b0f17',
+          flyout:                 '#111827',
+          scrollbar:              '#3b3f54',
+          scrollbarHover:         '#3b82f6',
+          insertionMarker:        '#ffffff',
+          insertionMarkerOpacity: 0.3,
+          fieldShadow:            'rgba(255,255,255,0.3)',
+          dragShadowOpacity:      0.6
+        }
+      });
+    }
+
+    // ── Initialise scratch-vm and wire up event bridge ───────────────
+    function initVM() {
+      vm = new window.VirtualMachine();
+
+      // When the VM reports updated workspace XML, render it in Blockly
+      vm.on('workspaceUpdate', function(data) {
+        if (!workspace || !data || !data.xml) return;
+        try {
+          var dom = Blockly.Xml.textToDom(data.xml);
+          Blockly.Xml.clearWorkspaceAndLoadFromXml(dom, workspace);
+        } catch (e) {
+          console.warn('[scratch-editor] workspaceUpdate parse error:', e);
+        }
+      });
+
+      // Forward Blockly edit events back to the VM so changes are saved
+      if (workspace) {
+        workspace.addChangeListener(function(e) {
+          if (!vm) return;
+          // Skip purely visual/UI events that don't affect block state
+          var uiEvt = (typeof Blockly.Events.UI !== 'undefined')
+            ? Blockly.Events.UI
+            : 'ui';
+          if (e.type === uiEvt) return;
+          try { vm.blockListener(e); } catch (listenerErr) {
+            console.warn('[scratch-editor] blockListener error:', listenerErr);
+          }
+        });
+      }
+    }
+
+    // ── Load a .sb3 project from an ArrayBuffer ──────────────────────
+    function loadProject(buffer) {
+      clearError();
+      if (!workspace) initWorkspace();
+      if (!vm)        initVM();
+
+      setStatus('Loading project\u2026');
+
+      vm.loadProject(buffer).then(function() {
+        var targets = vm.runtime.targets;
+        // Prefer the first non-stage sprite, fall back to stage
+        var target = targets.filter(function(t) { return !t.isStage; })[0]
+                  || targets[0];
+
+        if (target) {
+          vm.setEditingTarget(target.id);
+
+          // Populate toolbox with blocks for this target
+          try {
+            var toolboxXml = vm.runtime.getBlocksXML(target);
+            if (toolboxXml) workspace.updateToolbox(toolboxXml);
+          } catch (e) {
+            console.warn('[scratch-editor] toolbox update error:', e);
+          }
+
+          var spriteCount = targets.filter(function(t) { return !t.isStage; }).length;
+          setStatus(
+            'Editing \u201c' + target.getName() + '\u201d \u00b7 '
+            + spriteCount + ' sprite(s)'
+          );
+        } else {
+          setStatus('Project loaded');
+        }
+
+        hideSplash();
+
+        // Start the VM event loop (required for workspaceUpdate events)
+        try { vm.start(); } catch (e) {
+          console.warn('[scratch-editor] vm.start error (no renderer attached):', e);
+        }
+
+      }).catch(function(err) {
+        var msg = err && err.message ? err.message : String(err);
+        showError('Failed to load project: ' + msg);
+        setStatus('Load failed');
+      });
+    }
+
+    // ── Export the current project as a .sb3 download ────────────────
+    function exportProject() {
+      if (!vm) {
+        showError('No project loaded \u2014 nothing to export.');
+        return;
+      }
+      setStatus('Exporting\u2026');
+      vm.saveProjectSb3().then(function(blob) {
+        var url = URL.createObjectURL(blob);
+        var a   = document.createElement('a');
+        a.href     = url;
+        a.download = 'project.sb3';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        setStatus('Saved \u2192 project.sb3');
+      }).catch(function(err) {
+        var msg = err && err.message ? err.message : String(err);
+        showError('Export failed: ' + msg);
+        setStatus('Export failed');
+      });
+    }
+
+    // ── postMessage bridge: receive commands from the parent editor ───
+    // The iframe is sandboxed with allow-same-origin, so event.origin
+    // equals window.location.origin and the source check is sufficient.
+    // Reject any message that does not originate from the direct parent.
+    window.addEventListener('message', function(event) {
+      if (event.source !== window.parent) return;
+      if (event.origin !== window.location.origin) return;
+      var data = event.data;
+      if (!data || typeof data.type !== 'string') return;
+
+      switch (data.type) {
+        case 'tw-open-sb3':
+          if (data.buffer) loadProject(data.buffer);
+          break;
+        case 'tw-export-sb3':
+          exportProject();
+          break;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -13,7 +13,7 @@
     <div class="topbar__left">
       <a class="home-link" href="../" title="Home">🏠</a>
       <strong>Mini Scratch</strong>
-      <span class="pill" id="enginePill">TurboWarp embed</span>
+      <span class="pill" id="enginePill">Scratch blocks</span>
     </div>
 
     <div class="topbar__right">
@@ -58,7 +58,7 @@
           <div class="blocksHeader">
             <div>
               <strong>Scratch Blocks Editor</strong>
-              <div class="small2">Powered by TurboWarp. Use the buttons to open or export <code>.sb3</code> projects.</div>
+              <div class="small2">Use the buttons to open or export <code>.sb3</code> projects.</div>
             </div>
             <div class="blocksHeader__actions">
               <button class="btn2" id="btnOpenSb3">📂 Open .sb3</button>
@@ -68,16 +68,11 @@
 
           <iframe
             id="turbowarpFrame"
-            title="TurboWarp block editor"
+            title="Scratch block editor"
             class="twFrame"
-            src="./turbowarp-embed.html"
+            src="./scratch/"
             sandbox="allow-scripts allow-same-origin allow-forms allow-downloads allow-popups"
           ></iframe>
-
-          <div class="notice">
-            <strong>ℹ Note:</strong> Full postMessage integration (open/export hooks) is a follow-up step.
-            The iframe currently shows the hosted TurboWarp editor.
-          </div>
         </div>
       </div>
     </section>

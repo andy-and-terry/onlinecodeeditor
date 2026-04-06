@@ -192,15 +192,6 @@
   border: 0;
 }
 
-.notice {
-  padding: 8px 14px;
-  font-size: 12px;
-  color: var(--text-dim);
-  border-top: 1px solid var(--border);
-  background: var(--bg1);
-  flex-shrink: 0;
-}
-
 .hidden { display: none !important; }
 
 /* ── Right pane ──────────────────────────────────────────────────────── */
